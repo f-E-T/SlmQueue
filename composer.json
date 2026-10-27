@@ -56,6 +56,7 @@
             "dev-master": "4.0.x-dev"
         },
         "laminas": {
+            "module": "SlmQueue",
             "config-provider": "SlmQueue\\ConfigProvider"
         }
     },
@@ -75,6 +76,7 @@
         "test": [
             "phpunit",
             "@composer test --working-dir=tests/integration/mezzio"
-        ]
+        ],
+        "test-mvc": "@composer test --working-dir=tests/integration/laminas"
     }
 }

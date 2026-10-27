@@ -10,8 +10,8 @@ unchanged, so `fet/queue` cannot be installed next to `slm/queue`. See [UPGRADE.
 `slm/queue` 3.x.
 
 SlmQueue is a job queue abstraction layer for Laminas applications, such as Mezzio, that use
-[laminas-servicemanager](https://github.com/laminas/laminas-servicemanager). The Laminas MVC integration was removed in
-4.0. It supports various job queue systems and
+[laminas-servicemanager](https://github.com/laminas/laminas-servicemanager), and for Laminas MVC applications (on PHP 8.2
+to 8.4). It supports various job queue systems and
 makes your application independent from the underlying system you use. Each queue system needs an adapter that
 implements `SlmQueue\Queue\QueueInterface`.
 
@@ -47,8 +47,11 @@ SlmQueue works with [Composer](http://getcomposer.org). Make sure you have the c
 
 After installation of the package, you need to complete the following steps to use SlmQueue:
 
- 1. Register `SlmQueue\ConfigProvider` in your application's configuration (in Mezzio: `config/config.php`). If you use
+ 1. Register SlmQueue in your application. If you use
 [laminas-component-installer](https://github.com/laminas/laminas-component-installer), this happens automatically.
+    * Mezzio and other applications using a config provider: add `SlmQueue\ConfigProvider` to your configuration
+      (in Mezzio: `config/config.php`).
+    * Laminas MVC: add `SlmQueue` to the modules in your `config/modules.config.php` or `application.config.php`.
  2. Copy the `slm_queue.global.php.dist` (you can find this file in the `config` folder of SlmQueue) into
 your `config/autoload` folder and apply any setting you want.
 
@@ -61,9 +64,10 @@ Requirements
 * PHP 8.2, 8.3, 8.4 or 8.5
 * [laminas-servicemanager ^3.24](https://github.com/laminas/laminas-servicemanager)
 
-SlmQueue 4 dropped the Laminas MVC integration (the `SlmQueue` module and the `queue` controller plugin), because
-[Laminas MVC is retiring](https://getlaminas.org/blog/2026-03-06-laminas-mvc-eol-schedule.html) and will not support
-PHP 8.5. See [UPGRADE.md](UPGRADE.md).
+Laminas MVC applications are supported on PHP 8.2 to 8.4 only, because
+[Laminas MVC is retiring](https://getlaminas.org/blog/2026-03-06-laminas-mvc-eol-schedule.html) and does not support
+PHP 8.5. The Laminas MVC integration is deprecated and will be removed in a future major version. See
+[UPGRADE.md](UPGRADE.md).
 
 
 Code samples

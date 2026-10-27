@@ -3,6 +3,7 @@
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use SlmQueue\Command\StartWorkerCommand;
 use SlmQueue\Factory\JobPluginManagerFactory;
+use SlmQueue\Factory\QueueControllerPluginFactory;
 use SlmQueue\Factory\QueuePluginManagerFactory;
 use SlmQueue\Factory\StrategyPluginManagerFactory;
 use SlmQueue\Factory\WorkerPluginManagerFactory;
@@ -35,6 +36,13 @@ return [
     'laminas-cli' => [
         'commands' => [
             'slm-queue:start' => StartWorkerCommand::class,
+        ],
+    ],
+
+    // Laminas MVC only; ignored by other applications
+    'controller_plugins' => [
+        'factories' => [
+            'queue' => QueueControllerPluginFactory::class,
         ],
     ],
 

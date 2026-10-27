@@ -20,21 +20,21 @@ The `SlmQueue\` namespace is unchanged, so no code changes are needed for the re
 SlmQueue now supports the PHP versions that are [supported by the PHP project](https://www.php.net/supported-versions.php):
 8.2, 8.3, 8.4 and 8.5.
 
-## BC BREAK: Dropped the Laminas MVC integration
+## Laminas MVC: still supported, but only on PHP 8.2 to 8.4
 
+The `SlmQueue` module and the `queue` controller plugin work as before; no code changes are needed.
 [Laminas MVC is retiring](https://getlaminas.org/blog/2026-03-06-laminas-mvc-eol-schedule.html): it is security-only
-and will not support PHP 8.5. The Laminas project recommends moving to Mezzio, which SlmQueue keeps supporting through
-`SlmQueue\ConfigProvider`. The following were removed:
+until 31 December 2028 and does not support PHP 8.5. So in a Laminas MVC application, SlmQueue 4 runs on PHP 8.2,
+8.3 and 8.4 only.
 
-- `SlmQueue\Module`. Register `SlmQueue\ConfigProvider` in your Mezzio `config/config.php` instead.
-- The `queue` controller plugin (`SlmQueue\Controller\Plugin\QueuePlugin`) and its factory
-  (`SlmQueue\Factory\QueueControllerPluginFactory`). Inject the queue from `SlmQueue\Queue\QueuePluginManager`
-  into your request handler instead.
-- `SlmQueue\Controller\Exception\QueueNotFoundException`, which was only thrown by the controller plugin.
+`SlmQueue\Module` is deprecated. The Laminas MVC integration will be removed in a future major version after Laminas
+MVC's end of life. The Laminas project recommends moving to Mezzio, which uses `SlmQueue\ConfigProvider`.
 
-## BC BREAK: Configuration uses the `dependencies` key
+## BC BREAK: `config/module.config.php` uses the `dependencies` key
 
-`config/module.config.php` now registers its services under `dependencies` (Mezzio) instead of `service_manager`.
+If you include `config/module.config.php` directly, note that it now registers its services under `dependencies`
+instead of `service_manager`. `SlmQueue\Module::getConfig()` still returns them under `service_manager`, and
+`SlmQueue\ConfigProvider` under `dependencies`, as before.
 
 ## Dependencies
 

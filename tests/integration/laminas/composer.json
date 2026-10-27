@@ -1,0 +1,32 @@
+{
+    "require": {
+        "fet/queue": "*",
+        "laminas/laminas-mvc": "^3.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5 || ^12.0 || ^13.0"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "lib/"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "TestModule\\": "module/TestModule/src",
+            "SlmQueueTest\\": "lib/tests/src",
+            "SlmQueueMvcTest\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": [
+           "echo Running Laminas MVC integration tests...",
+           "./install.sh",
+           "@php test.php",
+           "phpunit"
+        ]
+    }
+}

@@ -44,3 +44,11 @@ jobs:
               run: "composer test"
               env:
                   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            # Laminas MVC does not support PHP 8.5. The integration project always installs the highest
+            # dependencies, so it only runs once per PHP version.
+            - name: "Run Laminas MVC integration tests"
+              if: matrix.php-version != '8.5' && matrix.dependencies == 'highest'
+              run: "composer test-mvc"
+              env:
+                  COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
