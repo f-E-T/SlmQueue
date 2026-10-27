@@ -14,6 +14,7 @@ composer require fet/queue:^4.0
 
 The `SlmQueue\` namespace is unchanged, so no code changes are needed for the rename. `fet/queue` conflicts with
 `slm/queue`, so packages that require `slm/queue` (such as the existing adapters) cannot be installed together with it.
+If you use `slm/queue-doctrine`, switch to [`fet/queue-doctrine`](https://github.com/f-E-T/SlmQueueDoctrine) 5.0.
 
 ## BC BREAK: Dropped support for PHP 7.4, 8.0 and 8.1
 

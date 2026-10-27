@@ -13,11 +13,13 @@ SlmQueue is a job queue abstraction layer for Laminas applications, such as Mezz
 [laminas-servicemanager](https://github.com/laminas/laminas-servicemanager), and for Laminas MVC applications (on PHP 8.2
 to 8.4). It supports various job queue systems and
 makes your application independent from the underlying system you use. Each queue system needs an adapter that
-implements `SlmQueue\Queue\QueueInterface`.
+implements `SlmQueue\Queue\QueueInterface`. Available adapters for `fet/queue`:
 
-The adapters written for `slm/queue` ([Doctrine ORM](https://github.com/Webador/SlmQueueDoctrine),
-[RabbitMQ](https://github.com/rnd-cosoft/slm-queue-rabbitmq), [Amazon SQS](https://github.com/Webador/SlmQueueSqs))
-require `slm/queue` and PHP 8.3 or older, so they cannot be installed together with `fet/queue`.
+* [Doctrine DBAL](https://github.com/f-E-T/SlmQueueDoctrine) (`fet/queue-doctrine`)
+
+The other adapters written for `slm/queue` ([RabbitMQ](https://github.com/rnd-cosoft/slm-queue-rabbitmq),
+[Amazon SQS](https://github.com/Webador/SlmQueueSqs)) require `slm/queue` and PHP 8.3 or older, so they cannot be
+installed together with `fet/queue`.
 
 When to use
 -----------
@@ -55,9 +57,9 @@ After installation of the package, you need to complete the following steps to u
  2. Copy the `slm_queue.global.php.dist` (you can find this file in the `config` folder of SlmQueue) into
 your `config/autoload` folder and apply any setting you want.
 
-NB. SlmQueue is a skeleton and therefore useless by itself. You need an adapter (an implementation of
-`SlmQueue\Queue\QueueInterface`, usually extending `SlmQueue\Queue\AbstractQueue`) for your queue system to push jobs
-into the queue.
+NB. SlmQueue is a skeleton and therefore useless by itself. You need an adapter for your queue system to push jobs into
+the queue, such as [fet/queue-doctrine](https://github.com/f-E-T/SlmQueueDoctrine), or your own implementation of
+`SlmQueue\Queue\QueueInterface` (usually extending `SlmQueue\Queue\AbstractQueue`).
 
 Requirements
 ------------
