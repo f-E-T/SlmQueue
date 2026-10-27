@@ -1,21 +1,23 @@
 SlmQueue
 ========
 
-Important notice
-----------
+[![Latest Stable Version](https://poser.pugx.org/fet/queue/v/stable.png)](https://packagist.org/packages/fet/queue)
 
-**We decided to move onto Symfony Messenger and we are therefore not maintaining this repository anymore. Feel free to fork it and
-make it your own.**
+This is a maintained fork of [Webador/SlmQueue](https://github.com/Webador/SlmQueue) (`slm/queue`), which is no longer
+maintained. It is published as `fet/queue`, starting at version 4.0, and supports the
+[PHP versions that are currently supported](https://www.php.net/supported-versions.php). The `SlmQueue\` namespace is
+unchanged, so `fet/queue` cannot be installed next to `slm/queue`. See [UPGRADE.md](UPGRADE.md) when coming from
+`slm/queue` 3.x.
 
-[![Latest Stable Version](https://poser.pugx.org/slm/queue/v/stable.png)](https://packagist.org/packages/slm/queue)
+SlmQueue is a job queue abstraction layer for Laminas applications, such as Mezzio, that use
+[laminas-servicemanager](https://github.com/laminas/laminas-servicemanager). The Laminas MVC integration was removed in
+4.0. It supports various job queue systems and
+makes your application independent from the underlying system you use. Each queue system needs an adapter that
+implements `SlmQueue\Queue\QueueInterface`.
 
-SlmQueue is a job queue abstraction layer for Laminas (formerly Zend Framework) and Mezzio (formerly Zend Expressive) applications. It supports various job queue systems and
-makes your application independent from the underlying system you use. The currently supported systems have each their
-own adapter library:
-
-* [Doctrine ORM](https://github.com/Webador/SlmQueueDoctrine)
-* [RabbitMQ](https://github.com/rnd-cosoft/slm-queue-rabbitmq)
-* [Amazon SQS](https://github.com/Webador/SlmQueueSqs) (outdated, [maintainers wanted](https://github.com/Webador/SlmQueueSqs/issues/58))
+The adapters written for `slm/queue` ([Doctrine ORM](https://github.com/Webador/SlmQueueDoctrine),
+[RabbitMQ](https://github.com/rnd-cosoft/slm-queue-rabbitmq), [Amazon SQS](https://github.com/Webador/SlmQueueSqs))
+require `slm/queue` and PHP 8.3 or older, so they cannot be installed together with `fet/queue`.
 
 When to use
 -----------
@@ -39,23 +41,29 @@ SlmQueue works with [Composer](http://getcomposer.org). Make sure you have the c
 
 ```json
 "require": {
-    "slm/queue": "^3.0"
+    "fet/queue": "^4.0"
 }
 ```
 
 After installation of the package, you need to complete the following steps to use SlmQueue:
 
- 1. Enable the module by adding `SlmQueue` in your `application.config.php` file.
+ 1. Register `SlmQueue\ConfigProvider` in your application's configuration (in Mezzio: `config/config.php`). If you use
+[laminas-component-installer](https://github.com/laminas/laminas-component-installer), this happens automatically.
  2. Copy the `slm_queue.global.php.dist` (you can find this file in the `config` folder of SlmQueue) into
 your `config/autoload` folder and apply any setting you want.
 
-NB. SlmQueue is a skeleton and therefore useless by itself. Enable an adapter to give you the implementation details
-you need to push jobs into the queue. Install one of the available adapters ([SlmQueueDoctrine](https://github.com/Webador/SlmQueueDoctrine), [SlmQueueRabbitMq](https://github.com/rnd-cosoft/slm-queue-rabbitmq), or [SlmQueueSqs](https://github.com/Webador/SlmQueueSqs)).
+NB. SlmQueue is a skeleton and therefore useless by itself. You need an adapter (an implementation of
+`SlmQueue\Queue\QueueInterface`, usually extending `SlmQueue\Queue\AbstractQueue`) for your queue system to push jobs
+into the queue.
 
 Requirements
 ------------
-* PHP >= 7.4
-* [laminas-servicemanager >= 3.3.1](https://github.com/laminas/laminas-servicemanager)
+* PHP 8.2, 8.3, 8.4 or 8.5
+* [laminas-servicemanager ^3.24](https://github.com/laminas/laminas-servicemanager)
+
+SlmQueue 4 dropped the Laminas MVC integration (the `SlmQueue` module and the `queue` controller plugin), because
+[Laminas MVC is retiring](https://getlaminas.org/blog/2026-03-06-laminas-mvc-eol-schedule.html) and will not support
+PHP 8.5. See [UPGRADE.md](UPGRADE.md).
 
 
 Code samples
@@ -108,25 +116,25 @@ class EmailJob extends AbstractJob
 }
 ```
 
-If you want to inject this job into a queue, you can do this for instance in your controller:
+If you want to inject this job into a queue, you can do this for instance in your request handler:
 
 ```php
-namespace MyModule\Controller;
+namespace MyModule\Handler;
 
-use MyModule\Job\Email as EmailJob;
+use Laminas\Diactoros\Response\EmptyResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use MyModule\Job\EmailJob;
 use SlmQueue\Queue\QueueInterface;
-use Laminas\Mvc\Controller\AbstractActionController;
 
-class MyController extends AbstractActionController
+class MyHandler implements RequestHandlerInterface
 {
-    protected $queue;
-
-    public function __construct(QueueInterface $queue)
+    public function __construct(private QueueInterface $queue)
     {
-        $this->queue = $queue;
     }
 
-    public function fooAction()
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // Do some work
 
@@ -134,13 +142,15 @@ class MyController extends AbstractActionController
             EmailJob::create('john@doe.com', 'Just hi', 'Hi, I want to say hi!'),
             ['delay' => 60]
         );
+
+        return new EmptyResponse();
     }
 }
 ```
 
 Now the above code lets you insert jobs in a queue, but then you need to spin up a worker which can process these jobs.
 
-SlmQueue integrates with [`laminas-cli`](https://github.com/laminas/laminas-servicemanager) for command line usage. You can start up a worker for queue "default" with the following command:
+SlmQueue integrates with [`laminas-cli`](https://github.com/laminas/laminas-cli) for command line usage. You can start up a worker for queue "default" with the following command:
 
 ```sh
 $ vendor/bin/laminas slm-queue:start default
@@ -152,7 +162,7 @@ Contributing
 SlmQueue is developed by various fanatic Laminas users. The code is written to be as generic as possible for
 Laminas applications. If you want to contribute to SlmQueue, fork this repository and start hacking!
 
-Any bugs can be reported as an [issue](https://github.com/Webador/SlmQueue/issues) at GitHub. If you want to
+Any bugs can be reported as an [issue](https://github.com/f-E-T/SlmQueue/issues) at GitHub. If you want to
 contribute, please be aware of the following guidelines:
 
  1. Fork the project to your own repository

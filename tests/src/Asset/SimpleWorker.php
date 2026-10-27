@@ -10,7 +10,7 @@ use SlmQueue\Worker\AbstractWorker;
 
 class SimpleWorker extends AbstractWorker
 {
-    public function __construct(EventManagerInterface $eventManager = null)
+    public function __construct(?EventManagerInterface $eventManager = null)
     {
         if (null === $eventManager) {
             $eventManager = new EventManager();

@@ -17,9 +17,9 @@ class ProcessJobEventTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
-        $this->worker = $this->createMock(WorkerInterface::class);
-        $this->job = $this->createMock(JobInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
+        $this->worker = $this->createStub(WorkerInterface::class);
+        $this->job = $this->createStub(JobInterface::class);
         $this->event = new ProcessJobEvent($this->job, $this->worker, $this->queue);
     }
 

@@ -8,7 +8,7 @@ use SlmQueue\Job\JobPluginManager;
 
 class SimpleQueueFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): SimpleQueue
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): SimpleQueue
     {
         $jobPluginManager = new JobPluginManager($container);
 

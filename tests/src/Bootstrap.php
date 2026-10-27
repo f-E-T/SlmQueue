@@ -30,8 +30,4 @@ if (! $loader) {
     throw new RuntimeException('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
 }
 
-if (! $config = @include __DIR__ . '/TestConfiguration.php') {
-    $config = require __DIR__ . '/TestConfiguration.php.dist';
-}
-
-ServiceManagerFactory::setConfig($config);
+ServiceManagerFactory::setConfig(require __DIR__ . '/testing.config.php');

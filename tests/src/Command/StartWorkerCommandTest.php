@@ -39,7 +39,7 @@ class StartWorkerCommandTest extends TestCase
         $eventManager = $worker->getEventManager();
 
         $this->queuePluginManager = $serviceManager->get(QueuePluginManager::class);
-        $this->output = $this->createMock(OutputInterface::class);
+        $this->output = $this->createStub(OutputInterface::class);
 
         $this->command = new StartWorkerCommand($this->queuePluginManager, $this->workerPluginManager);
     }
@@ -73,6 +73,7 @@ class StartWorkerCommandTest extends TestCase
         $queue = $this->queuePluginManager->get('basic-queue');
         $queue->push(new SimpleJob());
 
+        $this->output = $this->createMock(OutputInterface::class);
         $this->output
              ->expects($this->once())
              ->method('writeLn')

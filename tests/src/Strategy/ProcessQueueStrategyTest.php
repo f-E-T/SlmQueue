@@ -2,7 +2,7 @@
 
 namespace SlmQueueTest\Listener\Strategy;
 
-use Laminas\EventManager\EventManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SlmQueue\Job\JobInterface;
 use SlmQueue\Queue\QueueInterface;
@@ -16,9 +16,12 @@ use SlmQueueTest\Asset\JobWithNoReturnType;
 use SlmQueueTest\Asset\JobWithVoidReturnType;
 use SlmQueueTest\Asset\SimpleJob;
 use SlmQueueTest\Asset\SimpleWorker;
+use SlmQueueTest\Util\ListenerAttachmentAssertions;
 
 class ProcessQueueStrategyTest extends TestCase
 {
+    use ListenerAttachmentAssertions;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|QueueInterface  */
     protected $queue;
     protected $worker;
@@ -27,7 +30,7 @@ class ProcessQueueStrategyTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
         $this->worker = new SimpleWorker();
         $this->listener = new ProcessQueueStrategy();
     }
@@ -39,23 +42,19 @@ class ProcessQueueStrategyTest extends TestCase
 
     public function testListensToCorrectEventAtCorrectPriority(): void
     {
-        $evm = $this->createMock(EventManagerInterface::class);
         $priority = 1;
 
-        $evm->expects($this->at(0))
-            ->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onJobPop'], $priority);
-        $evm->expects($this->at(1))
-            ->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_JOB, [$this->listener, 'onJobProcess'], $priority);
-
-        $this->listener->attach($evm, $priority);
+        $this->assertListenerAttachments($this->listener, $priority, [
+            [WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onJobPop'], $priority],
+            [WorkerEventInterface::EVENT_PROCESS_JOB, [$this->listener, 'onJobProcess'], $priority],
+        ]);
     }
 
     public function testJobPopWithEmptyQueueTriggersIdleAndNoExitResultIsReturned(): void
     {
+        $this->queue = $this->createMock(QueueInterface::class);
         $popOptions = [];
-        $this->queue->expects($this->at(0))
+        $this->queue->expects($this->once())
             ->method('pop')
             ->with($popOptions)
             ->willReturn(null);
@@ -79,8 +78,9 @@ class ProcessQueueStrategyTest extends TestCase
 
     public function testJobPopWithEmptyQueueTriggersIdleAndExitResultIsReturned(): void
     {
+        $this->queue = $this->createMock(QueueInterface::class);
         $popOptions = [];
-        $this->queue->expects($this->at(0))
+        $this->queue->expects($this->once())
             ->method('pop')
             ->with($popOptions)
             ->willReturn(null);
@@ -104,13 +104,12 @@ class ProcessQueueStrategyTest extends TestCase
         static::assertTrue($event->propagationIsStopped(), "EventPropagation should be stopped");
     }
 
-    /**
-     * @dataProvider jobsProvider
-     */
+    #[DataProvider('jobsProvider')]
     public function testJobPopWithJobTriggersProcessJobEvent(JobInterface $job): void
     {
+        $this->queue = $this->createMock(QueueInterface::class);
         $popOptions = [];
-        $this->queue->expects($this->at(0))
+        $this->queue->expects($this->once())
             ->method('pop')
             ->with($popOptions)
             ->willReturn($job);
@@ -132,9 +131,7 @@ class ProcessQueueStrategyTest extends TestCase
         static::assertFalse($event->propagationIsStopped(), "EventPropagation should not be stopped");
     }
 
-    /**
-     * @dataProvider jobsProvider
-     */
+    #[DataProvider('jobsProvider')]
     public function testOnJobProcess(JobInterface $job): void
     {
         $event = new ProcessJobEvent($job, $this->worker, $this->queue);
@@ -146,7 +143,7 @@ class ProcessQueueStrategyTest extends TestCase
         static::assertSame('bar', $event->getJob()->getMetadata('foo'));
     }
 
-    public function jobsProvider(): array
+    public static function jobsProvider(): array
     {
         return [
             [new SimpleJob()],

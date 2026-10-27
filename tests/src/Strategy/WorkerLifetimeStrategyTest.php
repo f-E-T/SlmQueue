@@ -2,7 +2,6 @@
 
 namespace SlmQueueTest\Listener\Strategy;
 
-use Laminas\EventManager\EventManagerInterface;
 use PHPUnit\Framework\TestCase;
 use SlmQueue\Queue\QueueInterface;
 use SlmQueue\Strategy\AbstractStrategy;
@@ -13,9 +12,12 @@ use SlmQueue\Worker\Event\ProcessStateEvent;
 use SlmQueue\Worker\Event\WorkerEventInterface;
 use SlmQueue\Worker\Result\ExitWorkerLoopResult;
 use SlmQueueTest\Asset\SimpleWorker;
+use SlmQueueTest\Util\ListenerAttachmentAssertions;
 
 class WorkerLifetimeStrategyTest extends TestCase
 {
+    use ListenerAttachmentAssertions;
+
     protected $queue;
     protected $worker;
 
@@ -26,7 +28,7 @@ class WorkerLifetimeStrategyTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
         $this->worker = new SimpleWorker();
         $this->listener = new WorkerLifetimeStrategy();
     }
@@ -50,19 +52,14 @@ class WorkerLifetimeStrategyTest extends TestCase
 
     public function testListensToCorrectEventAtCorrectPriority(): void
     {
-        $evm = $this->createMock(EventManagerInterface::class);
         $priority = 1;
 
-        $evm->expects($this->at(0))->method('attach')
-            ->with(WorkerEventInterface::EVENT_BOOTSTRAP, [$this->listener, 'onBootstrap'], 1);
-        $evm->expects($this->at(1))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'checkRuntime'], -1000);
-        $evm->expects($this->at(2))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_IDLE, [$this->listener, 'checkRuntime'], -1000);
-        $evm->expects($this->at(3))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_STATE, [$this->listener, 'onReportQueueState'], 1);
-
-        $this->listener->attach($evm, $priority);
+        $this->assertListenerAttachments($this->listener, $priority, [
+            [WorkerEventInterface::EVENT_BOOTSTRAP, [$this->listener, 'onBootstrap'], 1],
+            [WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'checkRuntime'], -1000],
+            [WorkerEventInterface::EVENT_PROCESS_IDLE, [$this->listener, 'checkRuntime'], -1000],
+            [WorkerEventInterface::EVENT_PROCESS_STATE, [$this->listener, 'onReportQueueState'], 1],
+        ]);
     }
 
     public function testOnStopConditionCheckHandler(): void

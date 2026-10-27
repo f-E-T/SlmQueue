@@ -16,7 +16,7 @@ abstract class AbstractStrategy extends AbstractListenerAggregate
      */
     protected $state;
 
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         if (null !== $options) {
             $this->setOptions($options);

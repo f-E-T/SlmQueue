@@ -15,8 +15,8 @@ class FinishEventTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
-        $this->worker = $this->createMock(WorkerInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
+        $this->worker = $this->createStub(WorkerInterface::class);
         $this->event = new FinishEvent($this->worker, $this->queue);
     }
 

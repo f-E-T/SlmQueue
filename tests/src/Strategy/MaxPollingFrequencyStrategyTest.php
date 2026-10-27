@@ -2,7 +2,6 @@
 
 namespace SlmQueueTest\Strategy;
 
-use Laminas\EventManager\EventManagerInterface;
 use PHPUnit\Framework\TestCase;
 use SlmQueue\Queue\QueueInterface;
 use SlmQueue\Strategy\AbstractStrategy;
@@ -10,9 +9,12 @@ use SlmQueue\Strategy\MaxPollingFrequencyStrategy;
 use SlmQueue\Worker\Event\ProcessQueueEvent;
 use SlmQueue\Worker\Event\WorkerEventInterface;
 use SlmQueueTest\Asset\SimpleWorker;
+use SlmQueueTest\Util\ListenerAttachmentAssertions;
 
 class MaxPollingFrequencyStrategyTest extends TestCase
 {
+    use ListenerAttachmentAssertions;
+
     protected $queue;
     protected $worker;
     /** @var MaxPollingFrequencyStrategy */
@@ -20,7 +22,7 @@ class MaxPollingFrequencyStrategyTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
         $this->worker = new SimpleWorker();
         $this->listener = new MaxPollingFrequencyStrategy();
     }
@@ -46,13 +48,11 @@ class MaxPollingFrequencyStrategyTest extends TestCase
 
     public function testListensToCorrectEventAtCorrectPriority(): void
     {
-        $evm = $this->createMock(EventManagerInterface::class);
         $priority = 1;
 
-        $evm->expects($this->at(0))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onQueueProcessFinish'], 1000);
-
-        $this->listener->attach($evm, $priority);
+        $this->assertListenerAttachments($this->listener, $priority, [
+            [WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onQueueProcessFinish'], 1000],
+        ]);
     }
 
     public function testDelayWhenFrequencyIsSet(): void

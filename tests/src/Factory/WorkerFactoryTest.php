@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use SlmQueue\Factory\WorkerAbstractFactory;
 use SlmQueueTest\Util\ServiceManagerFactory;
 
-class AbstractWorkerTest extends TestCase
+class WorkerFactoryTest extends TestCase
 {
     public function testCreateService(): void
     {

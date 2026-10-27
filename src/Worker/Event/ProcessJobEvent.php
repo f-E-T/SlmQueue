@@ -8,7 +8,6 @@ use SlmQueue\Worker\WorkerInterface;
 
 class ProcessJobEvent extends AbstractWorkerEvent
 {
-
     /**
      * Status for unstarted jobs
      */

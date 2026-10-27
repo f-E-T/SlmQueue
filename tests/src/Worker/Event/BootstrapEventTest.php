@@ -7,7 +7,7 @@ use SlmQueue\Queue\QueueInterface;
 use SlmQueue\Worker\Event\BootstrapEvent;
 use SlmQueue\Worker\WorkerInterface;
 
-class WorkerEventTest extends TestCase
+class BootstrapEventTest extends TestCase
 {
     protected $queue;
     protected $worker;
@@ -15,8 +15,8 @@ class WorkerEventTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
-        $this->worker = $this->createMock(WorkerInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
+        $this->worker = $this->createStub(WorkerInterface::class);
         $this->event = new BootstrapEvent($this->worker, $this->queue);
     }
 

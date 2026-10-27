@@ -3,7 +3,6 @@
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use SlmQueue\Command\StartWorkerCommand;
 use SlmQueue\Factory\JobPluginManagerFactory;
-use SlmQueue\Factory\QueueControllerPluginFactory;
 use SlmQueue\Factory\QueuePluginManagerFactory;
 use SlmQueue\Factory\StrategyPluginManagerFactory;
 use SlmQueue\Factory\WorkerPluginManagerFactory;
@@ -22,7 +21,7 @@ use SlmQueue\Strategy\WorkerLifetimeStrategy;
 use SlmQueue\Worker\WorkerPluginManager;
 
 return [
-    'service_manager' => [
+    'dependencies' => [
         'factories' => [
             JobPluginManager::class => JobPluginManagerFactory::class,
             StrategyPluginManager::class => StrategyPluginManagerFactory::class,
@@ -36,12 +35,6 @@ return [
     'laminas-cli' => [
         'commands' => [
             'slm-queue:start' => StartWorkerCommand::class,
-        ],
-    ],
-
-    'controller_plugins' => [
-        'factories' => [
-            'queue' => QueueControllerPluginFactory::class,
         ],
     ],
 

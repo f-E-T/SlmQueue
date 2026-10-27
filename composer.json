@@ -1,5 +1,5 @@
 {
-    "name": "slm/queue",
+    "name": "fet/queue",
     "description": "Laminas module that integrates with various queue management systems",
     "license": "BSD-3-Clause",
     "type": "library",
@@ -9,7 +9,7 @@
         "queue",
         "job"
     ],
-    "homepage": "https://github.com/Webador/SlmQueue",
+    "homepage": "https://github.com/f-E-T/SlmQueue",
     "authors": [
         {
             "name": "Jurian Sluiman",
@@ -29,39 +29,33 @@
             "name": "Roel van Duijnhoven",
             "email": "roel.duijnhoven@gmail.com",
             "homepage": "http://www.roelvanduijnhoven.nl"
+        },
+        {
+            "name": "Marc Schulthess",
+            "email": "fet.ca26f02b@gmail.com"
         }
     ],
     "require": {
-        "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+        "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
         "ext-json": "*",
-        "laminas/laminas-eventmanager": "^3.4",
-        "laminas/laminas-servicemanager": "^3.11",
-        "laminas/laminas-stdlib": "^3.7.1",
-        "laminas/laminas-cli": "^1.2"
+        "laminas/laminas-eventmanager": "^3.15",
+        "laminas/laminas-servicemanager": "^3.24",
+        "laminas/laminas-stdlib": "^3.21",
+        "laminas/laminas-cli": "^1.13",
+        "symfony/console": "^6.4.8 || ^7.4 || ^8.1"
     },
     "require-dev": {
-        "laminas/laminas-mvc": "^3.3",
-        "laminas/laminas-modulemanager": "^2.11",
-        "laminas/laminas-view": "^2.13",
-        "laminas/laminas-serializer": "^2.11",
-        "laminas/laminas-log": "^2.15",
-        "laminas/laminas-i18n": "^2.12",
-        "laminas/laminas-config": "^3.7",
-        "phpunit/phpunit": "^9.3",
-        "squizlabs/php_codesniffer": "^3.6.2"
+        "phpunit/phpunit": "^11.5 || ^12.0 || ^13.0",
+        "squizlabs/php_codesniffer": "^3.13 || ^4.0"
     },
-    "suggest": {
-        "slm/queue-sqs": "If you are using Amazon SQS",
-        "slm/queue-beanstalkd": "If you are using Beanstalk",
-        "slm/queue-doctrine": "If you are using Doctrine ORM",
-        "rnd-cosoft/slm-queue-rabbitmq": "If you are using RabbitMQ"
+    "conflict": {
+        "slm/queue": "*"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1.x-dev"
+            "dev-master": "4.0.x-dev"
         },
         "laminas": {
-            "module": "SlmQueue",
             "config-provider": "SlmQueue\\ConfigProvider"
         }
     },
@@ -80,7 +74,6 @@
         "cs-fix": "phpcbf",
         "test": [
             "phpunit",
-            "@composer test --working-dir=tests/integration/laminas",
             "@composer test --working-dir=tests/integration/mezzio"
         ]
     }

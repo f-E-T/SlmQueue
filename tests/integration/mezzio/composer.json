@@ -1,9 +1,9 @@
 {
     "require": {
-        "slm/queue": "*",
-        "mezzio/mezzio": "^3.2.1",
-        "laminas/laminas-diactoros": "^2.3.0",
-        "laminas/laminas-config-aggregator": "^1.2"
+        "fet/queue": "*",
+        "mezzio/mezzio": "^3.23",
+        "laminas/laminas-diactoros": "^3.8",
+        "laminas/laminas-config-aggregator": "^1.19"
     },
     "repositories": [
         {

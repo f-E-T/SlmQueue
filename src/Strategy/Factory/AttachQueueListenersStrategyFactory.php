@@ -13,7 +13,7 @@ class AttachQueueListenersStrategyFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ): AttachQueueListenersStrategy {
         $pluginManager = $container->get(StrategyPluginManager::class);
         $config = $container->get('config');

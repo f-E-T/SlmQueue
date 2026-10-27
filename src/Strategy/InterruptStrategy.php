@@ -13,7 +13,7 @@ class InterruptStrategy extends AbstractStrategy
      */
     protected $interrupted = false;
 
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         parent::__construct($options);
 

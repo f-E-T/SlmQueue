@@ -2,7 +2,6 @@
 
 namespace SlmQueueTest\Listener\Strategy;
 
-use Laminas\EventManager\EventManagerInterface;
 use PHPUnit\Framework\TestCase;
 use SlmQueue\Queue\QueueInterface;
 use SlmQueue\Strategy\AbstractStrategy;
@@ -11,9 +10,12 @@ use SlmQueue\Worker\Event\ProcessQueueEvent;
 use SlmQueue\Worker\Event\WorkerEventInterface;
 use SlmQueue\Worker\Result\ExitWorkerLoopResult;
 use SlmQueueTest\Asset\SimpleWorker;
+use SlmQueueTest\Util\ListenerAttachmentAssertions;
 
 class InterruptStrategyTest extends TestCase
 {
+    use ListenerAttachmentAssertions;
+
     protected $queue;
     protected $worker;
     /** @var InterruptStrategy */
@@ -21,7 +23,7 @@ class InterruptStrategyTest extends TestCase
 
     public function setUp(): void
     {
-        $this->queue = $this->createMock(QueueInterface::class);
+        $this->queue = $this->createStub(QueueInterface::class);
         $this->worker = new SimpleWorker();
         $this->listener = new InterruptStrategy();
     }
@@ -33,17 +35,13 @@ class InterruptStrategyTest extends TestCase
 
     public function testListensToCorrectEventAtCorrectPriority(): void
     {
-        $evm = $this->createMock(EventManagerInterface::class);
         $priority = 1;
 
-        $evm->expects($this->at(0))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_IDLE, [$this->listener, 'onStopConditionCheck'], $priority);
-        $evm->expects($this->at(1))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onStopConditionCheck'], -1000);
-        $evm->expects($this->at(2))->method('attach')
-            ->with(WorkerEventInterface::EVENT_PROCESS_STATE, [$this->listener, 'onReportQueueState'], $priority);
-
-        $this->listener->attach($evm, $priority);
+        $this->assertListenerAttachments($this->listener, $priority, [
+            [WorkerEventInterface::EVENT_PROCESS_IDLE, [$this->listener, 'onStopConditionCheck'], $priority],
+            [WorkerEventInterface::EVENT_PROCESS_QUEUE, [$this->listener, 'onStopConditionCheck'], -1000],
+            [WorkerEventInterface::EVENT_PROCESS_STATE, [$this->listener, 'onReportQueueState'], $priority],
+        ]);
     }
 
     public function testOnStopConditionCheckHandlerNoSignal(): void

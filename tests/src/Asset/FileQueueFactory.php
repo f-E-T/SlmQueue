@@ -8,7 +8,7 @@ use SlmQueue\Job\JobPluginManager;
 
 class FileQueueFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): FileQueue
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): FileQueue
     {
         $config = $container->get('config')[FileQueue::class];
         $jobPluginManager = new JobPluginManager($container);

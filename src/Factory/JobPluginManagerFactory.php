@@ -9,7 +9,7 @@ use SlmQueue\Job\JobPluginManager;
 
 class JobPluginManagerFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): JobPluginManager
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): JobPluginManager
     {
         // We do not need to check if jobs is an empty array because every the JobPluginManager automatically
         // adds invokables if the job name is not known, which will be sufficient most of the time

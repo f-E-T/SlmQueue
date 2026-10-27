@@ -16,13 +16,12 @@ use SlmQueueTest\Asset\SimpleQueue;
 
 class QueueTest extends TestCase
 {
-    /**
-     * @var JobPluginManager&MockObject
-     */
     private JobPluginManager $jobPluginManager;
 
     private JobInterface $job;
     private string $jobName;
+    private JobInterface $binaryJob;
+    private string $binaryJobName;
     private QueueInterface $queue;
 
     public function setUp(): void
@@ -34,16 +33,28 @@ class QueueTest extends TestCase
         $this->binaryJob = new BinaryJob();
         $this->binaryJobName = BinaryJob::class;
 
-        $this->jobPluginManager = $this->createMock(JobPluginManager::class, [], [$serviceManager]);
+        $this->jobPluginManager = $this->createStub(JobPluginManager::class);
         $this->queue = new SimpleQueue('queue', $this->jobPluginManager);
+    }
+
+    /**
+     * Replaces the job plugin manager stub with a mock, for tests that set expectations on it
+     */
+    private function mockJobPluginManager(): MockObject
+    {
+        $jobPluginManager = $this->createMock(JobPluginManager::class);
+        $this->jobPluginManager = $jobPluginManager;
+        $this->queue = new SimpleQueue('queue', $jobPluginManager);
+
+        return $jobPluginManager;
     }
 
     public function testCanPushThenPopJob(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $this->queue->push($this->job);
         $job = $this->queue->pop();
@@ -57,10 +68,10 @@ class QueueTest extends TestCase
 
     public function testCanPushThenPopWithJobContent(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $this->job->setContent('Foo');
 
@@ -72,10 +83,10 @@ class QueueTest extends TestCase
 
     public function testCanPushThenPopWithJobMetadata(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $this->job->setMetadata('Foo', 'Bar');
 
@@ -147,10 +158,10 @@ class QueueTest extends TestCase
 
     public function testCanCreateJobWithFQCN(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $payload = '{"content":"N;","metadata":{"__name__":"SlmQueueTest\\\Asset\\\SimpleJob"}}';
         $job = $this->queue->unserializeJob($payload);
@@ -162,10 +173,10 @@ class QueueTest extends TestCase
 
     public function testCanCreateJobWithStringName(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with('SimpleJob')
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $payload = '{"content":"N;","metadata":{"__name__":"SimpleJob"}}';
         $job = $this->queue->unserializeJob($payload);
@@ -177,10 +188,10 @@ class QueueTest extends TestCase
 
     public function testCanCreateJobWithContent(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $payload = '{"content":"s:3:\"Foo\";","metadata":{"__name__":"SlmQueueTest\\\Asset\\\SimpleJob"}}';
         $job = $this->queue->unserializeJob($payload);
@@ -190,10 +201,10 @@ class QueueTest extends TestCase
 
     public function testCanCreateJobWithBinaryContent(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->binaryJobName)
-            ->will($this->returnValue($this->binaryJob));
+            ->willReturn($this->binaryJob);
 
         // 1x1px image
         $image = file_get_contents(dirname(__DIR__) . '/Asset/1x1px.png');
@@ -207,10 +218,10 @@ class QueueTest extends TestCase
 
     public function testCanCreateJobWithMetadata(): void
     {
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with($this->jobName)
-            ->will($this->returnValue($this->job));
+            ->willReturn($this->job);
 
         $payload = '{"content":"N;","metadata":{"Foo":"Bar","__name__":"SlmQueueTest\\\Asset\\\SimpleJob"}}';
         $job = $this->queue->unserializeJob($payload);
@@ -221,10 +232,10 @@ class QueueTest extends TestCase
     public function testCreateQueueAwareJob(): void
     {
         $job = new QueueAwareJob();
-        $this->jobPluginManager->expects($this->once())
+        $this->mockJobPluginManager()->expects($this->once())
             ->method('get')
             ->with('QueueAwareJob')
-            ->will($this->returnValue($job));
+            ->willReturn($job);
 
         $payload = '{"__name__":"QueueAwareJob","content":"N;","metadata":{"__name__":"QueueAwareJob"}}';
         $this->queue->unserializeJob($payload);
