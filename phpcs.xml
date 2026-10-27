@@ -11,5 +11,6 @@
   <file>tests</file>
 
   <exclude-pattern>tests/integration/*/vendor/*$</exclude-pattern>
+  <exclude-pattern>tests/integration/*/lib/*$</exclude-pattern>
 </ruleset>
 
